@@ -528,25 +528,10 @@ static uint64_t helper(mpz_t n, mpz_t d, mpz_t cc, uint64_t k)
 	mpz_fdiv_r_2exp(cc2, n, k1);
 	ans = helper(cc2, d, cc, k1);
 	// x->(3^c1*x+d1)/2^k1
-#if 0
-	if (mpz_sizeinbase(cc, 2) + mpz_sizeinbase(n, 2) + 1 > k)
-	 {
-        		printf("cc %d n %d d %d k %d\n", mpz_sizeinbase(cc, 2) , mpz_sizeinbase(n, 2) , mpz_sizeinbase(d, 2), k);
-	 }
-
-#endif
-#if 0
-	mpz_mul(n, n, cc);
-	mpz_add(n, n, d);
-	mpz_fdiv_q_2exp(n, n, k1);
-
-	mpz_fdiv_r_2exp(n, n, k2);
-#else
 	mpz_mullo(n, k, n, cc);
 	mpz_add(n, n, d);
 	mpz_fdiv_q_2exp(n, n, k1);
 	mpz_fdiv_r_2exp(n, n, k2);
-#endif
 	ans += helper(n, d2, cc2, k2);
 	// (3^c2*(3^c1*x+d1)/2^k1+d2)/2^k2=(3^(c1+c2)*x+(3^c2*d1+d2*2^k1))/2^k
 	mpz_mul(d, d, cc2);

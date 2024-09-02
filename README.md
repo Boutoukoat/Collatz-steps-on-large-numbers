@@ -8,6 +8,7 @@ Starting from a non-zero positive integer a_(0), iterate recursively
 The smallest k such that a_(k) == 1 is called the <b>total stopping time</b>.
 
 # What is new ?
+# Collatz iteration on very large numbers
 
 Famous "Collatz 3n+1 iteration" can run on large numbers at a fraction of the textbook algorithms time.
 
@@ -20,12 +21,13 @@ functions, and by a better control of temporary numbers and intermediate calcula
 # To compile and run
 
 ```
-sudo apt install libgmp3-dev
-make
-./collatz 10001
-./collatz 10000 100000 1000000 10000000
-./collatz 355*113
-./collatz "(5^3)*12"
+$ sudo apt install libgmp3-dev flex bison
+$ make
+$ ./collatz 10001
+$ ./collatz 10000 100000 1000000 10^7 
+$ ./collatz 10000+1
+$ ./collatz 355*113
+$ ./collatz "(5^3)*12"
 ```
 
 # Examples
@@ -41,6 +43,8 @@ f(27)=              111, time=       0.000 msecs.
 f(2^127-1)=        1660, time=       0.029 msecs.
 f(2^44497-1)=    598067, time=      14.632 msecs.
 ```
+
+displays the Collatz total stopping time (the number of iterations)  and the time (in milliseconds) needed to reach 1
 
 There is an extremely small demo file "demo.py" to get the total stopping time with increased numbers (the 51 known mersenne numbers).
 
