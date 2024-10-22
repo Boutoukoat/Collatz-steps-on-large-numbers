@@ -1,8 +1,8 @@
 
 
-GGG = g++ -O3 -march=native -fomit-frame-pointer -fexpensive-optimizations -flto -I/usr/local/include 
+GGG = g++ -O3 -march=native -fomit-frame-pointer -fexpensive-optimizations -flto -lgmp
 
-OBJ=main_collatz.o fastest_collatz.o bison.gmp_expr.o lex.gmp_expr.o
+OBJ = main_collatz.o fastest_collatz.o bison.gmp_expr.o lex.gmp_expr.o
 
 
 collatz: $(OBJ)
@@ -27,6 +27,6 @@ lex.gmp_expr.c : parser.l bison.gmp_expr.tab.h
 	flex parser.l
 
 clean:
-	rm ./collatz $(OBJ)
+	rm -f ./collatz $(OBJ)
 
 

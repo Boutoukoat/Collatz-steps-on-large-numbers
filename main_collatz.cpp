@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	mpz_t n;
 	mpz_init(n);
 
-	for (unsigned i = 1; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		struct timespec ts1, ts2;
 		unsigned long long steps;
 

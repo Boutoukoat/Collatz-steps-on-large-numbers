@@ -37,8 +37,17 @@ static inline uint64_t my_mul64(uint64_t a, uint64_t b, uint64_t * hi)
  asm(" mulq %[b]\n": "=a"(lo), "=d"(*hi): [a] "a"(a),[b] "rm"(b):"flags");
 	return lo;
 #endif
+#elif defined(__aarch64__)
+        uint64_t lo;
+
+ asm(" mul %[lo], %[a], %[b]\n umulh %[hi], %[a], %[b]\n":[hi] "=&r"(*hi),[lo] "=&r"(lo): [a] "r"(a),[b] "r"(b));
+
+                return lo;
 #else
-#error "ARM processors : use mull"
+                uint128_t tmp = a;
+                tmp *= b;
+                *hi = (uint64_t) (tmp >> 64);
+                return (uint64_t) tmp;
 #endif
 }
 
@@ -47,15 +56,60 @@ static inline uint8_t my_add64(uint8_t c, uint64_t a, uint64_t b, uint64_t * out
 {
 #ifdef __x86_64__
 	return _addcarry_u64(c, a, b, (unsigned long long *)out);
+#elif defined(__GNUC__)
+        bool carry_out;
+        carry_out = __builtin_uaddll_overflow(a, b, (unsigned long long *)out);
+        carry_out |= __builtin_uaddll_overflow(*out, c, (unsigned long long *)out);
+        return carry_out;
 #else
-#error "ARM processors : use adc"
+        uint64_t tmp;
+        uint8_t carry_out;
+        if (__builtin_constant_p(c) && c == 0) {
+                if (__builtin_constant_p(a) && a == 0) {
+                        tmp = b;
+                        carry_out = 0;
+                } else if (__builtin_constant_p(b) && b == 0) {
+                        tmp = a;
+                        carry_out = 0;
+                } else {
+                        tmp = a + b;
+                        carry_out = (tmp < b);
+                }
+        } else {
+                if (__builtin_constant_p(a) && a == 0) {
+                        tmp = b + c;
+                        carry_out = (tmp < b);
+                } else if (__builtin_constant_p(b) && b == 0) {
+                        tmp = a + c;
+                        carry_out = (tmp < a);
+                } else {
+                        tmp = a + c;
+                        carry_out = (tmp < a);
+                        tmp += b;
+                        carry_out |= (tmp < b);
+                }
+        }
+        *out = tmp;
+        return carry_out;
 #endif
 }
 
 // (a::b) >>= c
 static inline void my_shr64(uint64_t * a, uint64_t * b, uint64_t c)
 {
+#ifdef __x86_64__
  asm(" shrdq %%cl, %1, %0\n shrq %%cl, %1\n": "=r"(*b), "=r"(*a): "0"(*b), "1"(*a), "c"(c):"flags");
+#else
+        if (c == 0) {
+	}
+	else if (c == 64) {
+		*b = *a;
+		*a = 0;
+        } else {
+                (*b) = ((*b) >> c) | ((*a) << (64 - c));
+                (*a) >>= c;
+        }
+#endif
 }
 
 static inline uint64_t bzh64(uint64_t n, uint64_t pos)
@@ -528,7 +582,7 @@ static uint64_t helper(mpz_t n, mpz_t d, mpz_t cc, uint64_t k)
 	mpz_fdiv_r_2exp(cc2, n, k1);
 	ans = helper(cc2, d, cc, k1);
 	// x->(3^c1*x+d1)/2^k1
-	mpz_mullo(n, k, n, cc);
+	mpz_mul(n, n, cc);
 	mpz_add(n, n, d);
 	mpz_fdiv_q_2exp(n, n, k1);
 	mpz_fdiv_r_2exp(n, n, k2);
