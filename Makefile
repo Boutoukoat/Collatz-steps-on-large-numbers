@@ -1,12 +1,12 @@
 
 
-GGG = g++ -O3 -march=native -fomit-frame-pointer -fexpensive-optimizations -flto -lgmp
+GGG = g++ -O3 -march=native -fomit-frame-pointer -fexpensive-optimizations -flto
 
 OBJ = main_collatz.o fastest_collatz.o bison.gmp_expr.o lex.gmp_expr.o
 
 
 collatz: $(OBJ)
-	$(GGG) -s -o collatz $(OBJ) /usr/local/lib/libgmp.a
+	$(GGG) -static -o collatz $(OBJ) -lgmp
 
 main_collatz.o: main_collatz.cpp collatz.h
 	$(GGG) -c -o main_collatz.o main_collatz.cpp

@@ -25,7 +25,7 @@ int myinput (char *buf, int buflen) {
 "^" { return EXP; }
 "(" { return OPEN_B; }
 ")" { return CLOSE_B; }
-"0x"?[0-9]+  { gmp_exprlval.str = yytext; return NUMBER; }
+("0x"[0-9a-zA-Z]+)|([0-9]+)  { gmp_exprlval.str = yytext; return NUMBER; }
 [ \t\f]   { /* ignore whitespace */ }
 .   { printf("invalid character %c\n", *yytext); }
 %%
