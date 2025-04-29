@@ -1360,6 +1360,7 @@ extern char* gmp_expr_lex_data;
 void mpz_expression_parse(mpz_t n, char *str)
 {
  for (unsigned i = 0; i < STACK_SIZE; i++) mpz_init (stack[i]);
+ stack_ptr = stack[0];
  gmp_expr_lex_data = str;
  yyparse();
  mpz_set(n , stack[0]);
